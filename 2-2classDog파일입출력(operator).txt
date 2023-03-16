@@ -1,0 +1,163 @@
+
+
+============================================================
+소스.cpp, 저장시간: 03/14/23 Tuesday 18:59:51 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(2주 2일)
+// -------------------------------------------------------------------
+// cmd창 맨위 우클릭->속성->레이아웃->창 크기 너비 80
+//--------------------------------------------------------------------
+// 많은 수의 자료형 다루기 - class
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <random>
+#include <array>
+#include <fstream>
+
+#include "save.h"
+
+using namespace std;
+
+default_random_engine dre;
+uniform_int_distribution<> uidChar{ 'a','z' };
+uniform_int_distribution<> uidInt{ 1, 10'000 };
+
+class Dog {
+	char c;
+	int n;
+public:
+	Dog() {
+		c = uidChar(dre);
+		n =  uidInt(dre);
+	}
+	friend ostream& operator<<(ostream& os, const Dog& dog) {
+		return os << "글자 - " << dog.c << ", 숫자 - " << dog.n << ".\n";
+	}
+};
+
+// [문제] Dog 천 마리를 파일 "Dog 천 마리"에 저장하라.
+// 파일은 binary 모드로 열고, write 함수로 저장하라.
+
+//-----------
+int main()
+//-----------
+{
+	array<Dog, 1'000> dogs;
+	Dog dog;
+	cout << "Dog의 사이즈는: " << sizeof(Dog) << "이며, " << dog << '\n';			// 5bytes-> 8bytes (3공간의 패딩, 속도를 높임)
+
+	ofstream out{ "Dog 천 마리", ios::binary };
+	out.write((char*)&dogs, sizeof(Dog) * dogs.size());
+
+
+	save("소스.cpp");
+}
+
+============================================================
+소스.cpp, 저장시간: 03/14/23 Tuesday 19:01:10 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(2주 2일)
+// -------------------------------------------------------------------
+// cmd창 맨위 우클릭->속성->레이아웃->창 크기 너비 80
+//--------------------------------------------------------------------
+// 많은 수의 자료형 다루기 - class
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <random>
+#include <array>
+#include <fstream>
+
+#include "save.h"
+
+using namespace std;
+
+default_random_engine dre;
+uniform_int_distribution<> uidChar{ 'a','z' };
+uniform_int_distribution<> uidInt{ 1, 10'000 };
+
+class Dog {
+	char c;
+	int n;
+public:
+	Dog() {
+		c = uidChar(dre);
+		n =  uidInt(dre);
+	}
+	friend ostream& operator<<(ostream& os, const Dog& dog) {
+		return os << "글자 - " << dog.c << ", 숫자 - " << dog.n << ".\n";
+	}
+};
+
+// [문제] Dog 천 마리를 파일 "Dog 천 마리"에 저장하라.
+// 파일은 binary 모드로 열고, write 함수로 저장하라.
+
+//-----------
+int main()
+//-----------
+{
+	ofstream out{ "Dog 천 마리", ios::binary };
+
+	for (int i = 0; i < 1'000; i++) {
+		Dog dog;
+		out.write((char*)&dog, sizeof(Dog));
+	}
+
+
+	save("소스.cpp");
+}
+
+============================================================
+소스.cpp, 저장시간: 03/14/23 Tuesday 19:07:21 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(2주 2일)
+// -------------------------------------------------------------------
+// cmd창 맨위 우클릭->속성->레이아웃->창 크기 너비 80
+//--------------------------------------------------------------------
+// 많은 수의 자료형 다루기 - class
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <fstream>
+
+#include "save.h"
+
+using namespace std;
+
+class Dog {
+	char c;
+	int n;
+public:
+	friend ostream& operator<<(ostream& os, const Dog& dog) {
+		return os << "글자 - " << dog.c << ", 숫자 - " << dog.n << ".\n";
+	}
+	friend istream& operator>>(istream& is, Dog& dog) {
+		return is.read((char*)&dog, sizeof(Dog));
+	}
+};
+
+// [문제] 파일 "Dog 천 마리"에는 몇 마리인지 모르는 Dog가 저장되어 있다.
+// 파일은 binary 모드로 열었고, write 함수를 사용하여 저장하였다.
+// 모두 읽어 Dog정보를 cout으로 화면에 출력하라.
+
+//-----------
+int main()
+//-----------
+{	
+	ifstream in{ "Dog 천 마리", ios::binary };
+	Dog dog;
+
+	if (!in)
+		return 0;
+
+	while (in >> dog) {
+		cout << dog;
+	}
+
+
+	save("소스.cpp");
+}
