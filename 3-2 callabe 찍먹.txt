@@ -1,0 +1,62 @@
+
+
+============================================================
+소스.cpp, 저장시간: 03/21/23 Tuesday 18:58:34 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(3주 2일)
+//--------------------------------------------------------------------
+// 정렬(sort) - callavle type
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <array>
+#include <random>
+#include <format>
+#include <ranges>		// C++20
+
+#include "save.h"
+
+using namespace std;
+
+// 컴파일러가 값을 알 수 있는 시점
+// 1. 컴파일시에 결정 -> []
+// 2. 실행시에 결정	-> new
+
+// [문제] 랜덤값을 갖는 int 10'000'000 (천만)개를 준비하라.
+// 오름차순으로 정렬하라.
+// 값을 화면에 출력하라.
+
+array<int, 10'000'000> nums;
+default_random_engine dre;
+uniform_int_distribution uid{1, 10'000'000};
+
+int how(const void* a, const void* b) {
+	return *(int*)b - *(int*)a;
+}
+
+//-----------
+int main()
+//-----------
+{
+	for (int& n : nums) {
+		n = uid(dre);
+	}
+
+	// 오름차순으로 정렬, qsort( c ), sort(c++ 전용) <- 둘 다 generic 함수	(자료형에 상관없다)
+	int (*comp)(const void*, const void*) = how;
+	qsort(&nums, nums.size(), sizeof(int), comp);
+	
+	// 뒤에 있는 거 100개만 출력		원하는 조건에 맞게 뽑아낼 수 있다.
+	for (int n : nums |			// | <- 필터
+		views::drop(nums.size() - 100)) {			// 천만개 중에 100개 뺴고 드랍핑
+		cout << format("{:10}", n);
+	}
+
+	cout << endl;
+	// int __cdecl(void const * __ptr64,void const * __ptr64)
+	// int형을 반환하는 c스타일로 64비트 보이트 포인터 두 개를 받는 함수이다.
+	cout << "qsort의 4번째 인자 타입 - " << typeid(how).name() << endl;
+
+	save("소스.cpp");
+}
