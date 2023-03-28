@@ -1,0 +1,103 @@
+
+
+============================================================
+소스.cpp, 저장시간: 03/28/23 Tuesday 19:05:55 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(4주 2일)
+//--------------------------------------------------------------------
+// C++ 클래스 복습 - String 클래스를 작성
+// String 클래스는 STL 컨테이너가 되도록 다듬어 간다.
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <string>
+
+#include "save.h"
+
+using namespace std;
+
+// [문제] class String을 코딩하라.
+// 모든 special 함수의 동작을 관찰하라.
+
+bool 관찰 = false;
+
+class String {
+	size_t len{};					// 길이 (음수 저장 불가), default초기화 {0}과 같은활동
+	char* p{};						// 관심있으면 unique_ptr<char> p로 바꿔 코딩
+	size_t id{ ++sid };				// 객체의 고유 id
+
+	static size_t sid;				// 의(static) 동작을 공부할 것, 여기서 초기화가 안된다
+
+public:
+	String()/* = default*/ {
+		print("디폴트 생성");
+	}
+	String(const char* s) : len{ strlen(s) } {
+		p = new char[len];
+		memcpy(p, s, len);			// CPU개입없이 메모리끼리 초고속복사 = DMA
+
+		print("생성 (char*)");
+	}
+	~String() {
+		print("소멸");
+		// C++ 표준은 nullptr이여도 상관없다.
+		delete[] p;
+	}
+
+	String& operator=(const String& other) {
+		if (this == &other)		// 자기 자신을 할당할 이유는 없다
+			return *this;
+		delete[] p;
+
+		len = other.len;
+		p = new char[len];
+		memcpy(p, other.p, len);
+
+		print("(복사)할당 연산자");
+		return *this;
+	}
+
+	String operator+(const String& rhs) const {
+		String temp;
+		temp.len = len + rhs.len;
+		temp.p = new char[temp.len];
+
+		memcpy(temp.p, p, len);
+		memcpy(temp.p + len, rhs.p, rhs.len);
+
+		return temp;
+	}
+
+	friend ostream& operator<<(ostream& os, const String& s) {
+		for (int i = 0; i < s.len; ++i) {
+			os << s.p[i];
+		}
+		return os;
+	}
+
+	void print(const char* msg) const {
+		if (관찰) {
+			cout << "[" << id << "] - " << msg << ", 개수: " << len << ", 주소: " << (void*)p << endl;
+		}
+	}
+};
+
+size_t String::sid = 0;
+
+//-----------
+int main()
+//-----------
+{
+	관찰 = true;
+
+	String a{ "123" };
+	String b{ "4567890" };
+
+	//String c = a + b;			// 1234567890이 나오도록 ☆★☆★☆★☆복사생성자를 코딩하여★☆★☆★☆★
+	//cout << c << endl;
+	String c;
+	c = a + b;					// 터진다. 복사할당연산자를 코딩해야함.
+
+	save("소스.cpp");
+}
