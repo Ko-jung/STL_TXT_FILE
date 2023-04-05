@@ -1,0 +1,95 @@
+
+
+============================================================
+save.h, 저장시간: 03/07/23 Tuesday 17:49:54 
+============================================================
+//-------------------------------------------------------------------------------------------------------
+// save.h 한 학기 강의를 저장한다
+//-------------------------------------------------------------------------------------------------------
+
+#pragma once
+
+#ifndef __SAVE_H__
+#define __SAVE_H__
+
+#include <fstream>
+#include <vector>
+#include <chrono>
+#include <iomanip>
+#include <iostream>
+
+void save(const std::string& fileName);
+
+#endif // !__SAVE_H__
+
+============================================================
+save.cpp, 저장시간: 03/07/23 Tuesday 17:49:54 
+============================================================
+#include "save.h"
+
+void save(const std::string& fileName) {
+	// fileName을 읽기모드로 열기
+	std::ifstream in{ fileName };				//RAII
+	char c;
+
+	// 저장할 파일을 덧붙여 쓰기 모드로 열기
+	std::ofstream out{ "2023 1학기 STL 화910목78 강의저장.txt",std::ios::app };
+
+	// 저장할 파일에 시간을 기록한다
+	// epoch -> 1970/01/01 00:00:00 -> 나온숫자==time point
+	auto now = std::chrono::system_clock::now();	//std::chrono::time_point
+	using namespace std::literals::chrono_literals;
+	//std::cout << "현재시간 - " << now << 'n';
+
+
+	auto utc = std::chrono::system_clock::to_time_t(now);	//UTC시간으로 변환
+	auto lt = localtime(&utc);		//현지 시간으로 변환
+
+	////한국형식으로 날짜 출력
+	auto old = std::cout.imbue(std::locale("KO_kr"));
+
+	//out 파일에 한국형식의 날짜로 출력
+	out << '\n' << '\n';
+	out << "============================================================" << '\n';
+	out << fileName << std::put_time(lt, ", 저장시간: %x %A %X ") << '\n';
+	out << "============================================================" << '\n';
+	out.imbue(old);
+
+	// fileName에 있는 모든 내용을 읽어 저장할 파일에 덧붙인다.
+	// STL의 자료구조와 알고리즘을 이용하여 저장
+	std::vector<char> v{ std::istreambuf_iterator<char>{in}, {} };
+	std::copy(v.begin(), v.end(), std::ostream_iterator<char>{out});
+
+
+}
+
+
+============================================================
+소스.cpp, 저장시간: 03/07/23 Tuesday 17:49:54 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(1주 1일)
+//--------------------------------------------------------------------
+// VS 환경 : Release 모드/x64 (- 포인터 크기 8바이트), Project환경: C++언어 최신(미리보기 - C++ latest)
+//--------------------------------------------------------------------
+// 한학기 강의를 파일에 저장할 수 있는 코딩 (save 파일)
+//--------------------------------------------------------------------
+//#define _CRT_SECURE_NO_WARNINGS - 프로젝트 속성 - C/C++ - SDL 검사 - 아니오 로 변경하면 같은 효과
+
+#include <iostream>
+#include "save.h"
+
+int main() {
+
+	std::cout << "2023 STL" << '\n';
+
+	// 소스.cpp를 const char* 로 인식하는게 아닌 처음부터 string으로 받아드리게
+	using namespace std::string_literals;
+	save("save.h"s);
+	save("save.cpp"s);
+	save("소스.cpp"s);
+
+	return 0;
+}
+
+

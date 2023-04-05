@@ -1,0 +1,228 @@
+
+
+============================================================
+String.cpp, 저장시간: 04/06/23 Thursday 00:59:58 
+============================================================
+//==========================================================================================================
+// String.h - 자원을 확보하는 클래스
+// 
+// 2023.3.28 시작
+//==========================================================================================================
+#include <string>
+#include <iostream>
+
+#include "String.h"
+
+bool 관찰{ false };					// 관찰하려면 true로 바꿀것
+
+
+String::String()/* = default*/
+{
+	print("디폴트 생성");
+}
+String::String(const char* s) : len{ strlen(s) }
+{
+	p = new char[len];
+	memcpy(p, s, len);			// CPU개입없이 메모리끼리 초고속복사 = DMA
+
+	print("생성자 (char*)");
+}
+String::~String()
+{
+	print("소멸");
+	// C++ 표준은 nullptr이여도 상관없다.
+	delete[] p;
+}
+
+// 복사생성자 / 복사할당연산자
+String::String(const String& other)
+{
+	len = other.len;
+	p = new char[len];
+	memcpy(p, other.p, len);
+	print("복사생성자");
+}
+String& String::operator=(const String& other)
+{
+	if (this == &other)		// 자기 자신을 할당할 이유는 없다
+		return *this;
+	delete[] p;
+
+	len = other.len;
+	p = new char[len];
+	memcpy(p, other.p, len);
+
+	print("할당 연산자");
+	return *this;
+}
+
+// C++11 부터 move semantic이 지원, 이동생성자
+String::String(String&& other)
+{
+	len = other.len;
+	p = other.p;
+
+	// 이동된 객체를 초기화
+	other.len = 0;
+	other.p = nullptr;
+
+	print("이동생성자");
+}
+String& String::operator=(String&& other)
+{
+	if (this == &other)
+		return *this;
+
+	// 이미 할당한 자원을 반환
+	delete[] p;
+
+	//other의 자원을 이동
+	len = other.len;
+	p = other.p;
+
+	//other의 자원을 초기화
+	other.len = 0;
+	other.p = nullptr;
+
+	print("이동할당연산자");
+	return *this;
+}
+
+String String::operator+(const String& rhs) const
+{
+	String temp;
+	temp.len = len + rhs.len;
+	temp.p = new char[temp.len];
+
+	memcpy(temp.p, p, len);
+	memcpy(temp.p + len, rhs.p, rhs.len);
+
+	return temp;
+}
+
+// gettor
+std::string String::getString()const
+{
+	return std::string(p, len);
+}
+
+void String::print(const char* msg) const
+{
+	if (관찰) {
+		std::cout << "[" << id << "] - " << msg << ", 개수: " << len << ", 주소: " << (void*)p << std::endl;
+	}
+}
+
+size_t String::sid = 0;
+
+============================================================
+String.h, 저장시간: 04/06/23 Thursday 00:59:58 
+============================================================
+//==========================================================================================================
+// String.h - 자원을 확보하는 클래스
+// 
+// 2023.3.28 시작
+//==========================================================================================================
+
+#pragma once
+class ostream;
+class string;
+ 
+class String {
+	size_t len{ 0 };				// 확보한 자원 수
+	char* p{};						// 자원의 주소
+	size_t id{ ++sid };				// 객체의 id
+
+	static size_t sid;				// 의(static) 동작을 공부할 것, 여기서 초기화가 안된다
+
+public:
+	String();
+	String(const char* s);
+	~String();
+
+	// 복사생성자 / 복사할당연산자
+	String(const String& other);
+	String& operator=(const String& other);
+
+	// 이동생성자 / 이동할당생성자
+	String(String&& other);
+	String& operator=(String&& other);
+
+	// 연산자 오버로딩 함수들
+	String operator+(const String& rhs) const;
+
+	friend std::ostream& operator<<(std::ostream& os, const String& s) {
+		for (int i = 0; i < s.len; ++i) {
+			os << s.p[i];
+		}
+		return os;
+	}
+
+	// gettor
+	std::string getString() const ;
+
+	void print(const char* msg) const;
+};
+
+============================================================
+소스.cpp, 저장시간: 04/06/23 Thursday 00:59:58 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(5주 1일)
+//--------------------------------------------------------------------
+// C++ 클래스 복습 - String 클래스를 작성
+// String 클래스는 STL 컨테이너가 되도록 다듬어 간다.
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <string>
+#include <array>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+// [문제] class String을 코딩하라.
+// 모든 special 함수의 동작을 관찰하라.
+
+
+
+
+
+//-----------
+int main()
+//-----------
+{
+	String a{ "123" };						// 생성자
+	String b{ "4567890" };					// 생성자
+	String c = a;							// 복사생성자
+	c = a + b;								// (복사?)할당 연산자
+
+	array<String, 3> arr{ "345", "12", "6789" };	// 기본 생성자 3번
+
+	extern bool 관찰;
+	관찰 = true;
+	// arr을 오름차순으로 정렬
+	sort(arr.begin(), arr.end(), [](const String& a, const String& b) {
+		return a.getString() < b.getString();
+		});
+	관찰 = false;
+
+	//for (String& s : arr)
+	//	cout << s << endl;
+
+	String A{ "123" };
+	String B = A;			// A를 이용하여 B를 복사생성
+	String C = move(A);		// A를 이용하여 B를 복사생성
+
+	cout << A << endl;
+	cout << B << endl;
+	cout << C << endl;
+
+	save("String.cpp");
+	save("String.h");
+
+	save("소스.cpp");
+}
