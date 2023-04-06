@@ -1,0 +1,57 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/06/23 Thursday 16:47:25 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(5주 2일)
+//--------------------------------------------------------------------
+// Sequence Container - array
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <fstream>
+
+#include <thread>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+// [문제] "소스.cpp"의 단어를 모두 읽어 오름차순으로 정렬 후 화면에 출력하라
+
+
+//-----------
+int main()
+//-----------
+{
+	//vector<String> v;
+
+	//ifstream in{ "소스.cpp" };
+
+	//while (in) {
+	//	String str;
+	//	in >> str;
+	//	v.push_back(str);
+	//}
+
+	// =========================== 이런 방식도 있다 =========================== 
+	ifstream in{ "소스.cpp" };
+
+	//vector<String> v{자료구조시작, 자료구조끝};
+	vector<String> v{ istream_iterator<String>{ in }, {} };
+	// ======================================================================= 
+
+
+	sort(v.begin(), v.end(), [](const String& a, const String& b) {
+			return a.getString() < b.getString();
+		});
+
+	for (String& a : v)
+		cout << a << endl;
+
+	save("소스.cpp");
+}

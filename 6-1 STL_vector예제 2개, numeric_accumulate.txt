@@ -1,0 +1,57 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/06/23 Thursday 17:11:16 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(5주 2일)
+//--------------------------------------------------------------------
+// Sequence Container - array
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+//-----------
+int main()
+//-----------
+{
+	{
+		// [문제] 키보드에서 입력한 int의 합계와 평균을 출력하라
+
+		vector<int> v{ istream_iterator<int>{cin}, {} };			// 둘이 같은 역할이다.
+		//vector<int> v;											// 얘랑
+		//int num;
+		//while (cin >> num) {
+		//	v.push_back(num);
+		//}
+
+
+		auto sum = accumulate(v.begin(), v.end(), 0);				// 둘이 같은 역할이다.
+		//long long sum{};											// 얘랑
+		//for (int& a : v) {
+		//	sum += a;
+		//}
+
+		cout << sum << endl;
+		cout << (double)sum / v.size() << endl;
+
+		save("소스.cpp");
+	}
+
+	{
+		// [문제] 키보드에서 입력한 단어를 오름차순으로 정렬 후 출력하라
+		vector<String> s{ istream_iterator<String>{cin},{} };
+		sort(s.begin(), s.end(), [](const String& a, const String& b) {
+			return a.getString() < b.getString();
+			});
+		for (const String& a : s)
+			cout << a << endl;
+
+	}
+}
