@@ -1,0 +1,47 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/13/23 Thursday 17:09:57 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(7주 1일)
+//--------------------------------------------------------------------
+// Sequence Container - vector
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+//-----------
+int main()
+//-----------
+{
+	vector<int> v(100);
+	iota(v.begin(), v.end(), 1);
+
+	for (int n : v)
+		cout << n << ' ';
+	cout << endl;
+
+	// [문제] v에서 홀수를 제거하라
+	// 알고리즘 remove_if를 써서
+	v.erase(std::remove_if(v.begin(), v.end(), [](int& a) {
+			return a & 1;	// 기계어 1:1 판단, 홀수면 끝비트가 1이다
+		}), v.end());
+
+	// C++20 알고리즘 erase-remove idiom을 하나의 전역함수로 제공
+	//::erase(v, [](int n) {return n & 1; });
+
+	for (int n : v)
+		cout << n << ' ';
+	cout << endl;
+
+	save("소스.cpp");
+}

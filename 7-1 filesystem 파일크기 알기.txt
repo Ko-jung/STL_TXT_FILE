@@ -1,0 +1,36 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/13/23 Thursday 16:31:35 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(7주 1일)
+//--------------------------------------------------------------------
+// Sequence Container - vector
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <array>
+#include <filesystem>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+// [문제] "소스.cpp"에 있는 영문자를 vector<char>에 저장하라
+// 
+//-----------
+int main()
+//-----------
+{
+	vector<char> v;
+
+	auto size = filesystem::file_size("소스.cpp");
+	v.reserve(size);				// File 사이즈 만큼 예약
+	cout << size << endl;
+
+	save("소스.cpp");
+}

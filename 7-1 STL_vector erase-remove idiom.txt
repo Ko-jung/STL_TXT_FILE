@@ -1,0 +1,50 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/13/23 Thursday 16:52:08 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(7주 1일)
+//--------------------------------------------------------------------
+// Sequence Container - vector
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+bool targetValue(int& a) {
+	if (a == 3)
+		return true;
+	return false;
+}
+
+// [문제] "소스.cpp"에 있는 영문자를 vector<char>에 저장하라
+// 
+//-----------
+int main()
+//-----------
+{
+	vector<int> v{ 1,2,3,4,5 };
+
+	// [문제] v에서 3을 제거하라
+	// 알고리즘 remove를 사용하라
+	//v.erase(std::remove_if(v.begin(), v.end(), targetValue), v.end());
+
+	// 지웠지만 size()가 바뀌지 않았다.
+	vector<int>::iterator p = remove(v.begin(), v.end(), 3);
+	v.erase(p, v.end());									// 새로운 end를 p로 받아서 p부터 기존 end까지는 무의미한 값이므로 삭제
+	// erase-remove idiom									// erase와 remove는 한 쌍이다.
+
+	for (int i = 0; i < v.size(); ++i) {
+		cout << v[i] << ' ';
+	}
+	cout << endl;
+
+	save("소스.cpp");
+}
