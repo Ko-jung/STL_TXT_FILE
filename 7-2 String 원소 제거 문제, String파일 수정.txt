@@ -1,0 +1,245 @@
+
+
+============================================================
+String.h, 저장시간: 04/18/23 Tuesday 17:48:11 
+============================================================
+#pragma once
+//==========================================================================================================
+// String.h - 자원을 확보하는 클래스
+// 
+// 2023.3.28 시작
+//==========================================================================================================
+
+#pragma once
+class ostream;
+class string;
+
+class String {
+	size_t len{ 0 };				// 확보한 자원 수
+	char* p{};						// 자원의 주소
+	size_t id{ ++sid };				// 객체의 id
+
+	static size_t sid;				// 의(static) 동작을 공부할 것, 여기서 초기화가 안된다
+
+public:
+	String();
+	String(const char* s);
+	~String();
+
+	// 복사생성자 / 복사할당연산자
+	String(const String& other);
+	String& operator=(const String& other);
+
+	// 이동생성자 / 이동할당생성자
+	// 2023.04.11 이동이 안전함을 보증	- noexcept
+	String(String&& other) noexcept;
+	String& operator=(String&& other) noexcept;
+
+	// 연산자 오버로딩 함수들
+	String operator+(const String& rhs) const;
+
+	// 2023.04.13 추가
+	bool operator==(const String& rhs) const;
+
+	friend std::ostream& operator<<(std::ostream& os, const String& s) {
+		for (int i = 0; i < s.len; ++i) {
+			os << s.p[i];
+		}
+		return os;
+	}
+
+	// 2023. 4 .6 추가
+	friend std::istream& operator>>(std::istream& is, String& s) {
+		std::string str;
+		is >> str;
+		delete[] s.p;
+		s.len = str.size();
+		s.p = new char[s.len];
+		memcpy(s.p, str.data(), s.len);
+
+		return is;
+	}
+
+	// gettor
+	std::string getString() const;
+	void print(const char* msg) const;
+
+	// 2023. 4 .6 추가
+	size_t size() const;
+};
+
+============================================================
+String.cpp, 저장시간: 04/18/23 Tuesday 17:48:11 
+============================================================
+//==========================================================================================================
+// String.h - 자원을 확보하는 클래스
+// 
+// 2023.3.28 시작
+//==========================================================================================================
+#include <string>
+#include <iostream>
+#include <algorithm>
+
+#include "String.h"
+
+bool 관찰{ false };					// 관찰하려면 true로 바꿀것
+
+
+String::String()/* = default*/
+{
+	print("디폴트 생성");
+}
+String::String(const char* s) : len{ strlen(s) }
+{
+	p = new char[len];
+	memcpy(p, s, len);			// CPU개입없이 메모리끼리 초고속복사 = DMA
+
+	print("생성자 (char*)");
+}
+String::~String()
+{
+	print("소멸");
+	// C++ 표준은 nullptr이여도 상관없다.
+	delete[] p;
+}
+
+// 복사생성자 / 복사할당연산자
+String::String(const String& other)
+{
+	len = other.len;
+	p = new char[len];
+	memcpy(p, other.p, len);
+	print("복사생성자");
+}
+String& String::operator=(const String& other)
+{
+	if (this == &other)		// 자기 자신을 할당할 이유는 없다
+		return *this;
+	delete[] p;
+
+	len = other.len;
+	p = new char[len];
+	memcpy(p, other.p, len);
+
+	print("할당 연산자");
+	return *this;
+}
+
+// C++11 부터 move semantic이 지원, 이동생성자
+// 2023.04.11 이동이 안전함을 보증	- noexcept
+String::String(String&& other) noexcept
+{
+	len = other.len;
+	p = other.p;
+
+	// 이동된 객체를 초기화
+	other.len = 0;
+	other.p = nullptr;
+
+	print("이동생성자");
+}
+String& String::operator=(String&& other) noexcept
+{
+	if (this == &other)
+		return *this;
+
+	// 이미 할당한 자원을 반환
+	delete[] p;
+
+	//other의 자원을 이동
+	len = other.len;
+	p = other.p;
+
+	//other의 자원을 초기화
+	other.len = 0;
+	other.p = nullptr;
+
+	print("이동할당연산자");
+	return *this;
+}
+
+String String::operator+(const String& rhs) const
+{
+	String temp;
+	temp.len = len + rhs.len;
+	temp.p = new char[temp.len];
+
+	memcpy(temp.p, p, len);
+	memcpy(temp.p + len, rhs.p, rhs.len);
+
+	return temp;
+}
+
+// 2023.04.13 추가
+bool String::operator==(const String& rhs) const {
+	// //길이도 같고 내용도 같아야
+	// if (len != rhs.len)
+	// 	return false;
+	// for (int i = 0; i < len; ++i)
+	// 	if (p[i] != rhs.p[i])
+	// 		return false;
+	// return true;
+
+	return std::equal(p, p + len, rhs.p, rhs.p + rhs.len);
+
+}
+
+// gettor
+std::string String::getString()const
+{
+	return std::string(p, len);
+}
+
+void String::print(const char* msg) const
+{
+	if (관찰) {
+		std::cout << "[" << id << "] - " << msg << ", 개수: " << len << ", 주소: " << (void*)p << std::endl;
+	}
+}
+
+// 2023 .4 .6 추가
+size_t String::size() const
+{
+	return len;
+}
+
+size_t String::sid = 0;
+
+============================================================
+소스.cpp, 저장시간: 04/18/23 Tuesday 17:48:11 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(7주 2일)
+//--------------------------------------------------------------------
+// Sequence Container - vector - dynamic array
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <numeric>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+//-----------
+int main()
+//-----------
+{
+	vector<String> v{ "1", "2", "3", "4", "5", "3"};
+
+
+	// [문제] v에서 3을 제거하시오
+	erase(v, "3");
+
+	for (String& s : v)
+		cout << s << ' ';
+	cout << endl;
+
+
+	save("String.h");
+	save("String.cpp");
+	save("소스.cpp");
+}
