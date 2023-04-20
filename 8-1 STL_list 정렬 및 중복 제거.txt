@@ -1,0 +1,49 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/20/23 Thursday 16:51:05 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(8주 1일)
+//--------------------------------------------------------------------
+// Sequence Container - list(덱)
+//--------------------------------------------------------------------
+#include <iostream>
+#include <list>
+#include <fstream>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+//-----------
+int main()
+//-----------
+{
+	// [문제] "래퍼런스.txt"를 cont로 읽어와라
+	ifstream in{ "래퍼런스.txt" };
+	if (!in)
+		return 0;
+
+	list<String> cont;
+
+	String str;
+	while (in >> str)
+		cont.push_back(str);
+
+	// list의 정렬 함수
+	cont.sort([](String& a, String& b) {
+		return a.getString() < b.getString();
+		});
+
+	// 중복된 값을 지워라 (정렬이 되어야 쓸 수 있는걸로 보임)
+	cont.unique();
+
+	// 오름차순 정렬하라
+	for (String& s : cont)
+		cout << s << endl;
+
+	save("소스.cpp");
+}

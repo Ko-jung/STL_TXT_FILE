@@ -1,0 +1,49 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/20/23 Thursday 17:20:02 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(8주 1일)
+//--------------------------------------------------------------------
+// Sequence Container - list(덱)
+//--------------------------------------------------------------------
+#include <iostream>
+#include <list>
+#include <fstream>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+//-----------
+int main()
+//-----------
+{
+	// [문제] "래퍼런스.txt"를 cont로 읽어와라
+	ifstream in{ "래퍼런스.txt" };
+	if (!in)
+		return 0;
+
+	list<String> cont{ istream_iterator<String>{in},{} };
+
+	// [문제] 길이가 7글자인 단어는 모두 몇 개인지 출력하라
+	int cnt = count_if(cont.begin(), cont.end(), [](const String& s) {
+		return s.size() == 7;
+		});
+	cout << "7인 글자의 개수는 : " << cnt << "개." << endl;
+
+	// 그리고 "길이7.txt"에 한 줄에 하나씩 저장하라
+	ofstream out{ "길이7.txt" };
+	copy_if(cont.begin(), cont.end(), ostream_iterator<String>(out, "\n"),
+		[](String& s) {
+			return s.size() == 8;
+		});
+	//for(String& s:cont)
+	//	if (s.size() == 7)
+	//		out << s << endl;
+
+	save("소스.cpp");
+}

@@ -1,0 +1,49 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/20/23 Thursday 17:04:57 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(8주 1일)
+//--------------------------------------------------------------------
+// Sequence Container - list(덱)
+//--------------------------------------------------------------------
+#include <iostream>
+#include <list>
+#include <fstream>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+//-----------
+int main()
+//-----------
+{
+	// [문제] "래퍼런스.txt"를 cont로 읽어와라
+	ifstream in{ "래퍼런스.txt" };
+	if (!in)
+		return 0;
+
+	list<String> cont{ istream_iterator<String>{in},{} };
+
+	for (String& s : cont)
+		cout << s << endl;
+
+	save("소스.cpp");
+	while (true) {
+		cout << "찾을 단어를 입력하세요: ";
+		String s;
+		cin >> s;
+
+		// [문제] 단어가 있는지? 있다면 몇 번째 단어인지 출력하라
+		auto it = std::find(cont.begin(), cont.end(), s);
+		if (it != cont.end())
+			cout << "찾으시는 단어는 " << distance(cont.begin(), it) + 1 << "번째에 있습니다." << endl;				// begin()부터 it까지 몇 걸음 갔는지
+		else
+			cout << "찾으시는 단어가 없습니다." << endl;
+	}
+
+}

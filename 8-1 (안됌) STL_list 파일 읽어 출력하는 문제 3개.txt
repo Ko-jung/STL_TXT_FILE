@@ -1,0 +1,64 @@
+
+
+============================================================
+소스.cpp, 저장시간: 04/20/23 Thursday 16:22:35 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(8주 1일)
+//--------------------------------------------------------------------
+// Sequence Container - list(덱)
+//--------------------------------------------------------------------
+#include <iostream>
+#include <list>
+#include <fstream>
+#include <ranges>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+//-----------
+int main()
+//-----------
+{
+	// [문제] "래퍼런스.txt"를 cont로 읽어와라
+	ifstream in{ "래퍼런스.txt" };
+	if (!in)
+		return 0;
+
+	// Vector는 이렇게하면 안 된다.
+	list<String> cont{ istream_iterator<String> {in}, {}};	//list<String> cont;
+															//
+															//String tmp;
+															//while (in >> tmp) {
+															//	cont.push_back(tmp);
+															//}
+
+	// vector는 이렇게 쓰면 괜찮
+	// v.reserve(1000);
+	// v.assign(istream_iterator<String> {in}, {});
+
+
+	// [문제] cont를 정방향 출력하고 개수를 출력하라
+	cout << "================cont 정순 출력================" << endl;
+	cout << "모두 " << cont.size() << " 단어 만큼 읽었다." << endl;
+	//int i{};
+	//for (String& s : cont) {
+	//	cout << ++i << " - " << s << endl;
+	//}
+
+	// [문제] cont를 역순으로 출력해라
+	cout << "================cont 역순 출력================" << endl;
+	for (auto p = cont.rbegin(); p != cont.rend(); ++p)
+		cout << *p << endl;
+
+	// [문제] 제일 뒤 10개를 순서대로 출력하라
+	cout << "================cont 제일 뒤 10개 출력================" << endl;
+	auto pp = next(cont.begin(), cont.size() - 10);		// pp를 cont.size() - 10 자리로 이동
+	for (; pp != cont.end(); ++pp) {
+		cout << *pp << endl;
+	}
+
+	save("소스.cpp");
+}
