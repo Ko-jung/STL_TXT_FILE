@@ -1,0 +1,224 @@
+#include <iostream>
+#include <random>
+#include <fstream>
+#include <format>
+using namespace std;
+
+#include <vector>
+#include <ranges>
+//------------ 주 의 ------------
+// namespace std를 사용하였다.
+// include 문장을 답지에 적을 필요없다.
+// 실행되지 않는 코드를 적으면 감점한다
+// 답이 맞더라도 효율 낮은 코드나 알고리즘을 사용하지 않은 코드는 감점한다.
+// 프로그램 환경 - Release/x64, 프로젝트 속성 - 미리 보기 - 최신 C++ 초안의 기능(/std:c++latest)
+
+// e-class에서 시험.zip을 다운 받은 후 시작한다.
+
+// 각 문제를 해결하는데 필요한 코드( 멤버함수 포함 )를 답지에 적는다.
+// 화면 출력을 적으라는 문제는 출력된 내용을 답지에 적는다.
+
+
+//-----------------------------------------------------------------------------
+// class Test
+// num 만큼 int를 동적할당받는다. 할당받은 메모리는 랜덤값([2,999])으로 채운다.
+//-----------------------------------------------------------------------------
+class Test {
+	int num{};					// 랜덤값 [2, 999]
+	int* p{};					// 할당받은 메모리 시작 주소
+
+public:
+	Test( ) = default;
+
+	~Test( ) {
+		delete[] p;
+	}
+
+	//// 복사생성자 / 복사할당연산자
+	Test(const Test& other)
+	{
+		num = other.num;
+		p = new int[num];
+		memcpy(p, other.p, sizeof(int) * num);
+	}
+	Test& operator=(const Test& other)
+	{
+		if (this == &other)		// 자기 자신을 할당할 이유는 없다
+			return *this;
+		delete[] p;
+
+		num = other.num;
+		p = new int[num];
+		memcpy(p, other.p, sizeof(int) * num);
+
+
+		return *this;
+	}
+
+	Test(Test&& other) noexcept
+	{
+		num = other.num;
+		p = other.p;
+
+		// 이동된 객체를 초기화
+		other.num = 0;
+		other.p = nullptr;
+
+	}
+	Test& operator=(Test&& other) noexcept
+	{
+		if (this == &other)
+			return *this;
+
+		// 이미 할당한 자원을 반환
+		delete[] p;
+
+		//other의 자원을 이동
+		num = other.num;
+		p = other.p;
+
+		//other의 자원을 초기화
+		other.num = 0;
+		other.p = nullptr;
+
+		return *this;
+	}
+
+	friend istream& operator>>(istream& is, Test& t) {
+		is >> t.num;
+		delete[] t.p;
+		t.p = new int[t.num];
+		for (int i = 0; i < t.num; ++i) {
+			is >> t.p[i];
+		}
+
+		return is;
+	}
+
+	// num과 p에 저장된 int 값을 화면에 표시한다
+	void show( ) const {
+		cout << format( "num:{:4} - ", num );
+		int printCount = num;
+		if (15 < num)
+			printCount = 15;
+		for (int i = 0; i < printCount; ++i)
+			cout << format( "{:4}", p[i] );
+		if (15 < num)
+			cout << " ... ";
+		cout << endl;
+	}
+
+	void write( ostream& os ) const {
+		os << num << ' ';
+		for (int i = 0; i < num; ++i)
+			os << p[i] << ' ';
+	}
+
+	void sortInt() {
+		sort(p, p + num);
+	}
+
+	bool ishav999() {
+		auto it = find(p, p + num, 999);
+		if (it == p + num) return false;
+		else return true;
+	}
+
+	int getNum() const { return num; }
+};
+
+
+//---------
+int main( )
+//---------
+{
+	// "TEST 객체들.txt" 파일(텍스트 모드로 엶)에 Test 객체를 write() 멤버함수로 기록하였다.  
+	// 파일에는 몇 개인지 모르는 Test 객체가 저장되어 있다.
+
+	ifstream in{ "TEST 객체들.txt" };
+	if (!in) {
+		cout << "파일을 확인하세요" << endl;
+		return 0;
+	}
+
+
+
+
+	// [문제 1] 파일에 저장된 Test 객체를 읽어 컨테이너에 저장하려고 한다.
+	// 사용할 컨테이너를 적고 사용한 이유를 설명하라.							(10)
+
+
+
+
+
+	// [문제 2] 파일에 저장된 Test 객체를 읽어 컨테이너에 저장하라.
+	// Test 객체를 읽기 위해 추가한 코드를 모두 답지에 적어라.
+	// 마지막 객체의 show를 실행하고 화면 출력 중 num 값을 답지에 적어라.		(20)(코드:15, num값:5)
+
+	// (참고) 처음과 다음 원소가 다음과 같으면 제대로 읽은 것이다.
+	// num: 465 -  81 577 651 629 592 121 553 675 865 188 883 369 843 321 718 ...
+	// num : 93 - 686 882 956 955 819 421  62 227 378 969 722 220 728 164 566 ...
+	vector<Test> v;
+	Test t;
+	while (in >> t) {
+		//t.read(in);
+		v.push_back(t);
+	}
+	v.rbegin()->show();
+
+
+
+	// [문제 3] Test 객체가 확보한 메모리 p에 저장된 int를 오름차순으로 정렬하는 
+	// 멤버함수 sortInt()를 작성하라.													
+	// 컨테이너에 저장된 모든 Test 객체에 sortInt()를 호출하라.					(10)(멤버함수:5, 호출코드:5)
+
+	// (참고) 처음과 다음 원소의 show()를 호출하면 다음과 같이 출력될 것이다.
+	// num: 465 - 2  17  19  22  38  39  39  44  45  46  48  48  54  59  65 ...
+	// num : 93 - 1   2   4  11  16  17  31  50  62  62  87  90 124 135 138 ...
+	for (Test& t : v) {
+		t.sortInt();
+	}
+	v.begin()->show();
+
+
+
+	// [문제 4]	컨테이너에 저장한 객체를 num값을 기준으로하여 오름차순으로 정렬하라.
+	// 정렬된 첫 원소를 show()로 화면에 출력하고, 출력된 num값은 답지에 적어라.	(35)(관련코드:30, 출력값:5)
+
+	// (주의) 정렬하기 위해 추가한 내용을 모두 적을 것
+	sort(v.begin(), v.end(), [](const Test& a, const Test& b) {
+		return a.getNum() < b.getNum();
+		});
+	v.begin()->show();
+
+
+
+
+	// [문제5] 정렬된 컨테이너의 Test 객체를 역순으로 100개만 출력(show를 호출해서)하라.
+	//// 출력된 마지막(100번째) 객체의 num값을 답지에 적어라.						(15)(코드:10, 출력값:5)
+	//for (Test& t : v |
+	//	views::drop(v.size() - 100)) {
+	//	t.show();
+	//}
+	auto it = v.rbegin();
+	for (int i = 0; i < 100; ++i) {
+		it++->show();
+		//++it;
+	}
+	//for (; distance(v.begin(), it) + 1 != 100, ++it) {
+
+	//}
+	//for (; it != v.end(); ++it) {
+	//	it->show();
+	//}
+
+
+
+	// [문제 6] 컨테이너에 저장된 Test 객체의 int 값 중 999가 하나라도 포함된 객체는 몇 개인가?
+	// 몇 개인지 화면에 출력하고 답지에도 적어라.								(20)(코드:15, 출력값:5)
+	int count{};
+	for (Test& t : v) {
+		count += t.ishav999();
+	}
+	cout << count << endl;
+}
