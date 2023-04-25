@@ -1,0 +1,210 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+
+#include <format>
+#include <array>
+#include <ranges>
+#include <numeric>
+#include <functional>
+
+#include <list>
+#include <thread>
+#include <chrono>
+#include <cstring>
+#include <algorithm>
+#include <map>
+
+using namespace std::chrono_literals;
+
+class Player {
+	std::string name; // 이름, 길이[3, 15]
+	int score; // 점수
+	size_t id; // 아이디, 겹치는 아이디 있을 수 있음
+	size_t num; // free store에 확보한 바이트 수
+	char* p; // free store에 확보한 메모리의 시작번지
+public:
+	Player() {}
+	~Player() {
+		delete[] p;
+	}
+	// 복사생성자 / 복사할당연산자
+	Player(const Player& other)
+	{
+		name = other.name;
+		score = other.score;
+		id = other.id;
+		num = other.num;
+		p = new char[num];
+		memcpy(p, other.p, num);
+	}
+	Player& operator=(const Player& other)
+	{
+		if (this == &other)		// 자기 자신을 할당할 이유는 없다
+			return *this;
+		delete[] p;
+
+		name = other.name;
+		score = other.score;
+		id = other.id;
+		num = other.num;
+		p = new char[num];
+		memcpy(p, other.p, num);
+
+		return *this;
+	}
+
+	// C++11 부터 move semantic이 지원, 이동생성자
+	// 2023.04.11 이동이 안전함을 보증	- noexcept
+	Player(Player&& other) noexcept
+	{
+		name = other.name;
+		score = other.score;
+		id = other.id;
+		num = other.num;
+		p = other.p;
+		memcpy(p, other.p, num);
+
+		// 이동된 객체를 초기화
+		other.num = 0;
+		other.p = nullptr;
+	}
+	Player& operator=(Player&& other) noexcept
+	{
+		if (this == &other)
+			return *this;
+
+		// 이미 할당한 자원을 반환
+		delete[] p;
+
+		//other의 자원을 이동
+		name = other.name;
+		score = other.score;
+		id = other.id;
+		num = other.num;
+		p = other.p;
+		memcpy(p, other.p, num);
+
+		//other의 자원을 초기화
+		other.num = 0;
+		other.p = nullptr;
+
+		return *this;
+	}
+
+
+	int operator+(const Player& p) const {
+		return this->score + p.score;
+	}
+
+	void read(std::istream& is) {
+		is.read((char*)this, sizeof(Player));
+		p = new char[num];
+		is.read((char*)p, num);
+	}
+
+	void printInfo() {
+		std::cout << std::format("{:15}", name) << ", " << score << ", " << id << ", " << num << ", ";
+		for (int i = 0; i < num; i++) {
+			std::cout << p[i];
+		}
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, const Player& p) {
+		os << std::format("{:15}", p.name) << p.id << '\n';
+		return os;
+	}
+
+	int		getScore()	const	{ return score; }
+	int		getNum()	const	{ return num; }
+	int		getId()		const	{ return id; }
+	char*	getPPoint()	const	{ return p; }
+};
+
+std::array<Player, 2'000'000> players;
+std::list<Player> l_players;
+
+int main() {
+	std::ifstream in{ "D:\\23_1\\2023_STL\\2023 STL 과제\\2023 STL 과제 파일", std::ios::binary };
+
+	int index{ 0 };
+	for (int i = 0; i < 2'000'000; i++) {
+		players[i].read(in);
+		l_players.emplace_back(players[i]);
+	}
+
+	// 1번 출력: 수업시간에 배운 views::drop을 사용하려 했지만 2백만개 고정이라 random access가 훨씬 빠를거같아 이렇게 코딩
+	players[2'000'000 - 1].printInfo();
+	std::cout << '\n' << '\n' << '\n';
+	//for (Player& p : players | std::views::drop(players.size() - 1))
+	//	std::cout << p << '\n' << '\n' << '\n' << '\n';
+
+	// 2번 출력: std::accumulate쓰려했으나 단순 합산 문제가 아니라서 풀어서 사용
+	long long sum{ 0 };
+	int max{ 0 };
+	int highscoreIndex{ 0 };
+	for (int i = 0; i < players.size(); i++) {
+		int score = players[i].getScore();
+		sum += score;
+		if (max < score) {
+			highscoreIndex = i;
+			//std::cout << "순위가 변경됨: " << highscoreIndex << '\n';
+			max = score;
+		}
+	}
+	std::cout << "점수가 가장 큰 Player : ";
+	players[highscoreIndex].printInfo();
+	std::cout << "모든 Player의 평균 : " << sum / players.size() << '\n';
+
+	//auto sum = std::accumulate(players.begin(), players.end(),std::plus());
+	//[](Player& a, Player& b) {
+	//	return a.getScore() + b.getScore();
+	//}
+	//std::cout << players[0] + players[1] << '\n';
+
+	// 3. 파일에 출력하기 위해서 operator>> 코딩
+	// 우선 id기준으로 정렬 후 앞 뒤를 비교하여 같은 id인지 확인
+	std::ofstream out{ "같은아이디.txt" };
+	l_players.sort([](const Player& a, const Player& b) {
+		return a.getId() < b.getId();
+		});
+	{
+		int sameCount{ 0 };
+		auto p = l_players.begin();
+		auto front = p;	++front;
+		auto back = p; --back;
+
+		++p;
+		if (l_players.front().getId() == p->getId()) {
+			out << *p;
+			++sameCount;
+		}
+		for (int i = 1; i < 2'000'000 - 1; ++i) {
+			front = p;	++front;
+			back = p; --back;
+			if (p->getId() == (front)->getId() || p->getId() == (back)->getId()) {
+				out << *p;
+				++sameCount;
+			}
+			++p;
+		}
+		if (p->getId() == l_players.back().getId()) {
+			out << *p;
+			++sameCount;
+		}
+		std::cout << "아이디가 같은 객체: " << sameCount << std::endl;
+	}
+
+	// 4. list를 한 번씩 다 돌며 p에 대한 문자열을 정렬.
+	// 후에 a가 10개이상이라면 10번째 인덱스엔 무조건 a가 있다는 판단하에 count_if 람다함수 작성
+	for (Player& p : l_players) {
+		std::sort(p.getPPoint(), p.getPPoint() + p.getNum());
+	}
+	int cnt = std::count_if(l_players.begin(), l_players.end(), [](const Player& p) {
+		return (p.getPPoint())[9] == 'a';
+		});
+	std::cout << cnt << '\n';
+
+	// 5.
+
+}

@@ -8,3 +8,9 @@
 	b. push_back 말고 emplace 사용
 	c. 임의의 위치에서 삭제나 삽입이 자주 발생한다면 다른 컨테이너를 쓰자
 7. 벡터 sort는 그닥
+
+
+
+배열에 하나씩 증가된 값을 넣고싶다 - iota
+this_thread::sleep_for(1ms)의 ms쓰려면 using namespace std::chrono_literals; 선언해야한다
+sort함수를 쓰려면 이동생성자 이동복사연산자를 만들어줘야함
