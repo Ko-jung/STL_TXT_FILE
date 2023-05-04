@@ -1,0 +1,43 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/04/23 Thursday 16:20:11 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(10주 1일)
+//--------------------------------------------------------------------
+// 반복자 category - input / output / forward / bidirectional / random_access(전통적인 분류)
+//					contiguous( C++20 에서 추가된 )
+//--------------------------------------------------------------------
+#include <iostream>
+#include <list>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+// STL Template은 선언과 정의를 분리하지 않는다.
+template <class iter>
+void algo(iter it) {
+	// 너는 도대체 6가지 중 어떤 category니?
+	cout << typeid(iter::iterator_category).name() << endl;
+	cout << typeid(iter).name() << endl;
+	//cout << typeid(it).name() << endl;	// 같게 나온다
+	cout << endl;
+}
+
+random_access_iterator_tag;
+
+//-----------
+int main()
+//-----------
+{
+	vector<int> v;
+	list<int> l;
+	algo(std::begin(v));		// 반복자를 인자로 받아 어떤 category인지 출력
+	algo(std::begin(l));		// 반복자를 인자로 받아 어떤 category인지 출력
+	//algo(123);					// 반복자를 인자로 받아 어떤 category인지 출력
+	save("소스.cpp");
+}

@@ -1,0 +1,38 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/04/23 Thursday 16:52:33 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(10주 1일)
+//--------------------------------------------------------------------
+// 반복자 category - input / output / forward / bidirectional / random_access(전통적인 분류)
+//					contiguous( C++20 에서 추가된 )
+//--------------------------------------------------------------------
+#include <iostream>
+#include <forward_list>
+#include <list>
+#include <vector>
+#include <deque>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+template <class iter>
+void algo(iter it) {
+	// 모든 표준 반복자가 응답하는 내용으로 코딩해야 함
+	cout << typeid(iterator_traits<iter>::iterator_category).name() << endl;
+}
+
+//-----------
+int main()
+//-----------
+{
+	int* p;
+	algo(p);
+	save("소스.cpp");
+}

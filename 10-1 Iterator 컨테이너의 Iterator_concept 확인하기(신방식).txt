@@ -1,0 +1,44 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/04/23 Thursday 16:29:58 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(10주 1일)
+//--------------------------------------------------------------------
+// 반복자 category - input / output / forward / bidirectional / random_access(전통적인 분류)
+//					contiguous( C++20 에서 추가된 )
+//--------------------------------------------------------------------
+#include <iostream>
+#include <forward_list>
+#include <list>
+#include <vector>
+#include <deque>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+template <class iter>
+void algo(iter it) {
+	cout << typeid(iter::iterator_category).name() << endl;
+
+	// Vector가 contiguous인지 판별하려면 다른 타입을 검사해야 함 (신 방식)
+	cout << typeid(iter::iterator_concept).name() << endl;
+	cout << endl;
+}
+
+//-----------
+int main()
+//-----------
+{
+	/*algo(istream_iterator<char>{  cin });
+	algo(ostream_iterator<char>{ cout });
+	algo(forward_list<int>::iterator{ });
+	algo(list<String>{}.begin());
+	algo(deque<int>::reverse_iterator());*/
+	algo(vector<char>{}.cbegin());
+	save("소스.cpp");
+}
