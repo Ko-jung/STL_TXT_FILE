@@ -1,0 +1,373 @@
+
+
+============================================================
+String.h, 저장시간: 05/11/23 Thursday 17:10:00 
+============================================================
+#pragma once
+//==========================================================================================================
+// String.h - 자원을 확보하는 클래스
+// 
+// 2023.3.28 시작
+//==========================================================================================================
+
+#pragma once
+class ostream;
+class string;
+
+// 2023. 5. 9
+class String_iterator {
+public:
+	// 반복자가 되기위한 질문에 대한 대답들
+#ifdef __cpp_lib_concepts
+	using iterator_concept = std::contiguous_iterator_tag;
+#endif // __cpp_lib_concepts
+	using iterator_category = std::random_access_iterator_tag;
+	using value_type = char;
+	using difference_type = long long;
+	using pointer = char*;
+	using reference = char&;
+
+private:
+	char* p;
+
+public:
+	String_iterator(char* p) :p{ p } {}
+
+public:
+	// for (auto p = s.begin(); p != s.end(); ++p) 와 *p를 해결하기 위해.
+	//bool operator!=(const String_iterator& rhs) const {
+	//	return p != rhs.p;
+	//} 밑으로 옮김 <=>으로
+	String_iterator& operator++() {
+		++p;
+		return *this;
+	}
+	char& operator*() const {
+		return *p;
+	}
+
+public:
+	// sort 알고리즘을 위한 연산자들 (LegacyRandomAccessIterator에서 필요로 하는 연산자들 일부)
+	difference_type operator-(const String_iterator& rhs) const {
+		return p - rhs.p;
+	}
+	String_iterator operator-(const difference_type diff) const {
+		return String_iterator(p - diff);
+	}
+
+	String_iterator& operator--() {
+		--p;
+		return *this;
+	}
+	String_iterator operator+(const difference_type diff) const {
+		return String_iterator(p + diff);
+	}
+
+	// c++20에서 지원되는 <=>연산자로 대체한다										
+	// three-way comparision operator, spaceship operator			
+	// 멤버함수가 잘 알려진 타입 (char*) 하나이기 때문에 deault로 해결이 된다.
+	auto operator<=>(const String_iterator& rhs) const = default;
+
+
+
+	//// <, <=, >, >=, ==, != --> 관계, 비교 연산자
+	//bool operator<(const String_iterator& rhs) const {
+	//	return p < rhs.p;
+	//}
+	//bool operator==(const String_iterator& rhs) const {
+	//	return p == rhs.p;
+	//}
+	//bool operator!=(const String_iterator& rhs) const {
+	//	return p != rhs.p;
+	//}	
+};
+
+// 2023. 5. 9
+class String_reverse_iterator {
+	char* p;
+public:
+	// String_reverse_iterator() {}
+	String_reverse_iterator(char* p) : p{ p } { }
+
+public:
+	// for (auto p = s.rbegin(); p != s.rend(); ++p) 와 *p를 해결하기 위해.
+	bool operator!=(const String_reverse_iterator& rhs) const {
+		return p != rhs.p;
+	}
+	String_reverse_iterator& operator++() {
+		// 반복자 어댑터 반복자처럼 하는데 속에선 딴 짓을 한다.
+		--p;
+		return *this;
+	}
+	char& operator*() const {
+		// 반대는 한 칸 옆을 제공한다.
+		return *(p - 1);
+	}
+};
+
+class String {
+	size_t len{ 0 };				// 확보한 자원 수
+	char* p{};						// 자원의 주소
+	size_t id{ ++sid };				// 객체의 id
+
+	static size_t sid;				// 의(static) 동작을 공부할 것, 여기서 초기화가 안된다
+
+public:
+	String();
+	String(const char* s);
+	~String();
+
+	// 복사생성자 / 복사할당연산자
+	String(const String& other);
+	String& operator=(const String& other);
+
+	// 이동생성자 / 이동할당생성자
+	// 2023.04.11 이동이 안전함을 보증	- noexcept
+	String(String&& other) noexcept;
+	String& operator=(String&& other) noexcept;
+
+	// 연산자 오버로딩 함수들
+	String operator+(const String& rhs) const;
+
+	// 2023.04.13 추가
+	bool operator==(const String& rhs) const;
+
+	friend std::ostream& operator<<(std::ostream& os, const String& s) {
+		for (int i = 0; i < s.len; ++i) {
+			os << s.p[i];
+		}
+		return os;
+	}
+
+	// 2023. 4 .6 추가
+	friend std::istream& operator>>(std::istream& is, String& s) {
+		std::string str;
+		is >> str;
+		delete[] s.p;
+		s.len = str.size();
+		s.p = new char[s.len];
+		memcpy(s.p, str.data(), s.len);
+
+		return is;
+	}
+
+	// gettor
+	std::string getString() const;
+	void print(const char* msg) const;
+
+	// 2023. 4 .6 추가
+	size_t size() const;
+
+	// STL 표준 컨테이너라면 제공해야 할 함수
+	// 2023. 5. 4 추가
+	// 2023. 5. 9 수정	(char* -> String_iterator)
+	String_iterator begin();
+	String_iterator end();
+
+	// 2023. 5. 9 추가
+	// 역방향 출력을 위해 역방향 반복자를 코딩
+	String_reverse_iterator rbegin();
+	String_reverse_iterator rend();
+
+	// 2023. 5. 11 set에 String을 담으려면 어디선가 < 연산자가 정의 되어있어야 함
+	bool operator<(const String& rhs) const;
+};
+
+============================================================
+String.cpp, 저장시간: 05/11/23 Thursday 17:10:00 
+============================================================
+//==========================================================================================================
+// String.h - 자원을 확보하는 클래스
+// 
+// 2023.3.28 시작
+//==========================================================================================================
+#include <string>
+#include <iostream>
+#include <algorithm>
+
+#include "String.h"
+
+bool 관찰{ false };					// 관찰하려면 true로 바꿀것
+
+
+String::String()/* = default*/
+{
+	print("디폴트 생성");
+}
+String::String(const char* s) : len{ strlen(s) }
+{
+	p = new char[len];
+	memcpy(p, s, len);			// CPU개입없이 메모리끼리 초고속복사 = DMA
+
+	print("생성자 (char*)");
+}
+String::~String()
+{
+	print("소멸");
+	// C++ 표준은 nullptr이여도 상관없다.
+	delete[] p;
+}
+
+// 복사생성자 / 복사할당연산자
+String::String(const String& other)
+{
+	len = other.len;
+	p = new char[len];
+	memcpy(p, other.p, len);
+	print("복사생성자");
+}
+String& String::operator=(const String& other)
+{
+	if (this == &other)		// 자기 자신을 할당할 이유는 없다
+		return *this;
+	delete[] p;
+
+	len = other.len;
+	p = new char[len];
+	memcpy(p, other.p, len);
+
+	print("할당 연산자");
+	return *this;
+}
+
+// C++11 부터 move semantic이 지원, 이동생성자
+// 2023.04.11 이동이 안전함을 보증	- noexcept
+String::String(String&& other) noexcept
+{
+	len = other.len;
+	p = other.p;
+
+	// 이동된 객체를 초기화
+	other.len = 0;
+	other.p = nullptr;
+
+	print("이동생성자");
+}
+String& String::operator=(String&& other) noexcept
+{
+	if (this == &other)
+		return *this;
+
+	// 이미 할당한 자원을 반환
+	delete[] p;
+
+	//other의 자원을 이동
+	len = other.len;
+	p = other.p;
+
+	//other의 자원을 초기화
+	other.len = 0;
+	other.p = nullptr;
+
+	print("이동할당연산자");
+	return *this;
+}
+
+String String::operator+(const String& rhs) const
+{
+	String temp;
+	temp.len = len + rhs.len;
+	temp.p = new char[temp.len];
+
+	memcpy(temp.p, p, len);
+	memcpy(temp.p + len, rhs.p, rhs.len);
+
+	return temp;
+}
+
+// 2023.04.13 추가
+bool String::operator==(const String& rhs) const {
+	// //길이도 같고 내용도 같아야
+	// if (len != rhs.len)
+	// 	return false;
+	// for (int i = 0; i < len; ++i)
+	// 	if (p[i] != rhs.p[i])
+	// 		return false;
+	// return true;
+
+	return std::equal(p, p + len, rhs.p, rhs.p + rhs.len);
+
+}
+
+// gettor
+std::string String::getString()const
+{
+	return std::string(p, len);
+}
+
+void String::print(const char* msg) const
+{
+	if (관찰) {
+		std::cout << "[" << id << "] - " << msg << ", 개수: " << len << ", 주소: " << (void*)p << std::endl;
+	}
+}
+
+// 2023 .4 .6 추가
+size_t String::size() const
+{
+	return len;
+}
+
+// STL 표준 컨테이너라면 제공해야 할 함수
+// 2023. 5. 4 추가
+// 2023. 5. 9 수정	(char* -> String_iterator)
+String_iterator String::begin()
+{
+	return p;
+}
+String_iterator String::end()
+{
+	return p + len;
+}
+
+
+// 2023. 5. 9 추가
+// 역방향 출력을 위해 역방향 반복자를 코딩
+String_reverse_iterator String::rbegin()
+{
+	// String_reverse_iterator은 char*를 받아 이 위치를 기억해야한다.
+	return String_reverse_iterator(p + len);
+}
+String_reverse_iterator String::rend()
+{
+	return p;
+}
+
+// 2023. 5. 11 set에 String을 담으려면 어디선가 < 연산자가 정의 되어있어야 함
+bool String::operator<(const String& rhs) const
+{
+	return len < rhs.len;
+}
+
+size_t String::sid = 0;
+
+============================================================
+소스.cpp, 저장시간: 05/11/23 Thursday 17:10:00 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 1일)
+//--------------------------------------------------------------------
+// Assoiciative container - Set/Map
+//--------------------------------------------------------------------
+#include <iostream>
+#include <set>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	// s는 String을 길이 오름차순으로 정렬한다.
+	set<String> s{ "5","222", "1111", "44", "33333" };
+	for (const String& s : s)
+		cout << s << ' ';
+	cout << endl;
+	save("String.h");
+	save("String.cpp");
+	save("소스.cpp");
+}

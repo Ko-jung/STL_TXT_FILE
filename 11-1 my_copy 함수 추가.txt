@@ -1,0 +1,44 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/11/23 Thursday 16:36:49 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 1일)
+//--------------------------------------------------------------------
+// 알고리즘 - generic function(자료형에 무관한 함수), find, find_if, copy
+//--------------------------------------------------------------------
+#include <iostream>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+template <class iter>
+void algo(iter it) {
+	// 모든 표준 반복자가 응답하는 내용으로 코딩해야 함
+	cout << typeid(iterator_traits<iter>::iterator_category).name() << endl;
+}
+
+template <class InIt, class OutIt>
+void my_copy(InIt beg, InIt end, OutIt out) {
+	for (; beg != end; ++beg)
+		*out++ = *beg;
+}
+
+//-----------
+int main()
+//-----------
+{
+	// save("String.h");
+	// save("String.cpp");
+	save("소스.cpp");
+
+	String s{ "1234567890" };
+	String s2;
+	my_copy(s.begin(), s.end(), ostream_iterator<char>{cout, " - "});
+	//cout << s2 << endl;
+}

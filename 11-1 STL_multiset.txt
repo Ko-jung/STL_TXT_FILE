@@ -1,0 +1,37 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/11/23 Thursday 17:14:37 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 1일)
+//--------------------------------------------------------------------
+// Assoiciative container - Set/Map
+//--------------------------------------------------------------------
+#include <iostream>
+#include <set>
+#include <fstream>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	ifstream in{ "소스.cpp" };
+	// s는 String을 길이 오름차순으로 정렬한다.
+	// set<String> s{ istream_iterator<String>{in}, {} };				// 중복 불가
+	multiset<String> s{ istream_iterator<String>{in}, {} };				// 중복 가능
+
+	for (const String& s : s)
+		cout << s << endl;
+	cout << endl;
+
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+}

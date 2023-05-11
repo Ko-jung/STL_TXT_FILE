@@ -1,0 +1,59 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/11/23 Thursday 16:52:54 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 1일)
+//--------------------------------------------------------------------
+// 알고리즘 - generic function(자료형에 무관한 함수), find, find_if, copy
+//--------------------------------------------------------------------
+#include <iostream>
+#include <algorithm>
+
+#include <vector>
+#include <array>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+template <class iter>
+void algo(iter it) {
+	// 모든 표준 반복자가 응답하는 내용으로 코딩해야 함
+	cout << typeid(iterator_traits<iter>::iterator_category).name() << endl;
+}
+
+template <class InIt, class OutIt>
+void my_copy(InIt beg, InIt end, OutIt out) {
+	for (; beg != end; ++beg)
+		*out++ = *beg;
+}
+
+//-----------
+int main()
+//-----------
+{
+	String s{ "1234567890" };
+	vector<char> v;
+	array<char, 10> a;
+													//v.reserve(s.size());
+
+													// v.begin()으로 하면 돌아가지 않는다. size가 바뀌지 않기 때문
+	copy(s.begin(), s.end(), back_inserter(v));		// 원소를 삽입하는 개념이기 때문에 size가 바뀐다.
+	for (auto c : v)								// back_insserter를 따라가보면 알 수 있듯이 operator=에서 push_back을 호출함을 볼 수 있음.
+		cout << c << " ";
+	cout << endl;
+
+
+	copy(s.begin(), s.end(), a.begin());
+	for(auto c : a)
+		cout << c << " ";
+	cout << endl;
+
+	// save("String.h");
+	// save("String.cpp");
+	save("소스.cpp");
+}

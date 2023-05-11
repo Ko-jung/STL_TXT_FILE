@@ -1,0 +1,52 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/11/23 Thursday 16:19:48 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 1일)
+//--------------------------------------------------------------------
+// 알고리즘 - generic function(자료형에 무관한 함수), find, find_if, copy
+//--------------------------------------------------------------------
+#include <iostream>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+template <class iter>
+void algo(iter it) {
+	// 모든 표준 반복자가 응답하는 내용으로 코딩해야 함
+	cout << typeid(iterator_traits<iter>::iterator_category).name() << endl;
+}
+
+template <class It, class comp>
+It my_find_if(It beg, It end, comp com) {
+	for (; beg != end; ++beg) {
+		if (com(*beg)) return beg;
+	}
+	return end;
+}
+
+//-----------
+int main()
+//-----------
+{
+	// save("String.h");
+	// save("String.cpp");
+	 save("소스.cpp");
+
+	String s{ "456489156195156a4891456+4896" };
+
+	// [문제] s에서 영문자가 있는지, 있다면 어디인지 출력하라
+	auto p = my_find_if(s.begin(), s.end(), [](char c) {
+		return isalpha(c);
+		});
+	if (p != s.end())
+		cout << distance(s.begin(), p) + 1 << "에서 영문자 발견!" << endl;
+	else
+		cout << "없다." << endl;
+}
