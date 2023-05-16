@@ -1,0 +1,54 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/16/23 Tuesday 18:14:31 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 2일)
+//--------------------------------------------------------------------
+// Assoiciative container - Set/Map
+// Set은 'equivalence(동등성) 관계'를 사용하여 'uniqueness를 결정'한다.
+// 
+// 중요한 것은 정렬 순서를 컨테이너에게 알려줘야 한다.
+// 1. Default가 std::less<String> -> 코드 속에서 operator<를 불러
+//		-> String에 operator<를 정의하면 된다.
+// 2. struct std::less를 less<String>으로 특수화 한다.
+// 3. 사용자가 정렬방법을 함수객체로 지정
+//--------------------------------------------------------------------
+#include <iostream>
+#include <set>
+#include <fstream>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+// 특수화, 특수화한 class를 우선으로 인식한다.
+// const-volatile -> const 약속이 깨질것이 걱정된다. 함수에 const를 붙여서 원본이 보장됨을 증명해주자.
+template <>
+struct less<String> {
+	bool operator()(const String& a, const String& b) const {
+		//cout << "@@" << endl;
+		return a.getString() < b.getString();
+	};
+};
+
+//-----------
+int main()
+//-----------
+{
+	ifstream in{ "이상한 나라의 앨리스.txt" };								// set - 2'948, multiset - 26'626
+	set<String> s{ istream_iterator<String>{in}, {} };				// 중복 가능
+
+	for (const String& s : s)
+		cout << s << endl;
+	cout << endl;
+
+	cout << "읽은 단어 수 - " << s.size() << endl;
+
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+}
