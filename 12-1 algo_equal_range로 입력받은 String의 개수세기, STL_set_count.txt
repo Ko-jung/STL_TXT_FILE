@@ -1,0 +1,65 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/18/23 Thursday 16:33:37 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 2일)
+//--------------------------------------------------------------------
+// Assoiciative container - Set/Map
+// 
+//--------------------------------------------------------------------
+#include <iostream>
+#include <set>
+#include <fstream>
+#include <algorithm>
+#include <ranges>
+#include <vector>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+
+	ifstream in{ "이상한 나라의 앨리스.txt" };							// set - 2'948, multiset - 26'626
+	multiset<String> ms{ istream_iterator<String>{in}, {} };		// 중복 가능
+	vector<String> v{ ms.begin(), ms.end()};		// 중복 가능
+	//sort(v.begin(), v.end());
+
+	cout << "읽은 단어 수 - " << v.size() << endl;
+
+	// [문제] 입력한 단어가 몇 개 있는지 출력하라
+	for (const String& s : v | views::drop(10'000) | views::take(200))
+		cout << s << endl;
+	
+	while (true) {
+		cout << "찾을 단어?: ";
+		String word;
+		cin >> word;
+
+		// ms는 트리 구조라서 노드가 띄엄띄엄있다.
+		// count를 호출하면 word가 처음 나오는 위치를 찾아 선형의 시간으로 센다.
+		// 자료가 붙어있었다면 극적으로 빠르겠지만 얘는 아니다.
+		// cout << ms.count(word) << endl;;
+
+
+		// binary search, 정렬이 되어 있어야함
+		// pair(하한선, 상한선), structured-binding ([]으로 변수이름 지정가능)
+		auto [하한, 상한] = equal_range(v.begin(), v.end(), word);
+		int cnt = 상한 - 하한;
+		if (cnt)
+			cout << cnt << "개가 있습니다." << endl;
+		else
+			cout << "없습니다." << endl;
+	}
+
+}

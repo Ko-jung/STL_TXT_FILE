@@ -1,0 +1,56 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/18/23 Thursday 16:00:13 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(11주 2일)
+//--------------------------------------------------------------------
+// Assoiciative container - Set/Map
+// 
+//--------------------------------------------------------------------
+#include <iostream>
+#include <set>
+#include <fstream>
+#include <algorithm>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	ifstream in{ "이상한 나라의 앨리스.txt" };							// set - 2'948, multiset - 26'626
+	set<String> s{ istream_iterator<String>{in}, {} };				// 중복 불가
+	//multiset<String> s{ istream_iterator<String>{in}, {} };		// 중복 가능
+
+	// for (const String& s : s)
+	// 	cout << s << endl;
+
+	cout << "읽은 단어 수 - " << s.size() << endl;
+
+	// [문제] String을 입력받아 그 String이 포함된 모든 set의 원소를 출력하라.
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+
+	while (true) {
+		cout << "String 입력: ";
+		String str;
+		cin >> str;
+
+		for (const String& s : s) {
+			//auto it = std::search(s.begin(), s.end(), str.begin(), str.end());
+			//if (it != s.end())	cout << s << "  ";
+
+			std::string stri = str.getString();
+			if(stri.contains(s.getString())) cout << s << "  ";
+		}
+		cout << endl;
+	}
+
+}

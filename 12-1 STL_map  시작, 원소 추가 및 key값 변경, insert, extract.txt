@@ -1,0 +1,58 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/18/23 Thursday 17:20:13 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(12주 1일)
+//--------------------------------------------------------------------
+// Assoiciative container - Map
+// pair<key, value>를 원소로 갖는다
+// 
+//--------------------------------------------------------------------
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <ranges>
+
+#include <list>
+#include <map>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	ifstream in{ "이상한 나라의 앨리스.txt" };	
+
+	// 영화제목과 출연자들 uniform init
+	map<String, list<String>> SLMap{
+		{"죠죠의 기묘한 모험",		{"죠나단 조스타", "디오 브란도"}},
+		{"인셉션",				{"조셉 조든레빗", "엘런 페이지", "톰 하디"}}
+	};
+
+	// 원소를 추가
+	list<String>& tmp = SLMap["인셉션"];		// value 반환
+	tmp.insert(tmp.end(), "킬리언 하피");
+
+	// 제목을 변경하고 싶다 - C++ 멤버 extract
+	auto node = SLMap.extract("인셉션");
+	node.key() = "Inception";
+	SLMap.insert(move(node));
+
+	for (auto [title, actors] : SLMap) {
+		cout << title << " - ";
+		for (const auto& s : actors)
+			cout << "\"" << s << "\",  ";
+		cout << endl;
+	}
+
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+}
