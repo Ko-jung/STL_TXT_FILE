@@ -1,0 +1,50 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/23/23 Tuesday 18:19:43 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(12주 2일)
+//--------------------------------------------------------------------
+// Assoiciative container - Map
+// pair<key, value>를 원소로 갖는다
+//--------------------------------------------------------------------
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <ranges>
+
+#include <list>
+#include <map>
+#include <vector>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	ifstream in{ "이상한 나라의 앨리스.txt"s };	
+	// [문제] 소설에서 사용된 단어의 빈도를 많이 사용된 순서로 출력하라.
+	map<String, int> SIMap;
+	String s;
+	while (in >> s) {
+		SIMap[s]++;
+	}
+	//for (const auto& [s, i] : SIMap)
+	//	cout << s << " - " << i << endl;
+
+	multimap<int, String> ISMap;
+	for (const auto& [단어, 개수] : SIMap)
+		ISMap.insert({ 개수, 단어 });
+	for (const auto& [개수, 단어] : ISMap | views::reverse)
+		cout << 단어 << " - " << 개수 << endl;
+
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+}

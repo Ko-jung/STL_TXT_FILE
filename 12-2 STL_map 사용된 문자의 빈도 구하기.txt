@@ -1,0 +1,78 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/23/23 Tuesday 18:08:41 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(12주 2일)
+//--------------------------------------------------------------------
+// Assoiciative container - Map
+// pair<key, value>를 원소로 갖는다
+//--------------------------------------------------------------------
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <ranges>
+
+#include <list>
+#include <map>
+#include <vector>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+void printMap(auto& SLMap) {
+	cout << "=====Map 원소들 출력=====" << endl;
+	for (auto [title, actors] : SLMap) {	// 구조화된 바인딩
+		cout << title << " - ";
+		for (const auto& s : actors)
+			cout << "\"" << s << "\",  ";
+		cout << endl;
+	}
+	cout << endl;
+}
+
+//-----------
+int main()
+//-----------
+{
+	ifstream in{ "이상한 나라의 앨리스.txt"s };	
+	// [문제] 소설에서 사용된 문자의 빈도를 출력하라.
+	map<char, int> CIMap;
+	char c;
+	while (in >> c) {
+		if(isalpha(c))
+			++CIMap[tolower(c)];
+	}
+
+	// Key값으로 오름차순
+	cout << "Key값으로 오름차순 출력" << endl;
+	for (const auto& [ch, count] : CIMap)
+		cout << ch << " - " << count << endl;
+
+	// Value값으로 오름차순
+	vector<pair<char, int>> v{CIMap.begin(), CIMap.end()};
+	sort(v.begin(), v.end(), [](const pair<char,int>& a, const pair<char, int>& b) {
+		return a.second > b.second;
+		});
+	cout << "Vector를 사용한 Value값으로 오름차순 출력" << endl;
+	for (const auto& [ch, count] : v)
+		cout << ch << " - " << count << endl;
+
+	cout << "map를 사용한 Value값으로 오름차순 출력" << endl;
+	map<int, char> ICMap;
+	for (const auto& [ch, count] : CIMap)
+		ICMap.insert({ count, ch });
+
+	for (const auto& [count, ch] : ICMap | views::reverse)
+		cout << ch << " - " << count << endl;
+
+
+
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+}

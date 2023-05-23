@@ -1,0 +1,45 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/23/23 Tuesday 18:44:46 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(12주 2일)
+//--------------------------------------------------------------------
+// Assoiciative container - Map
+// pair<key, value>를 원소로 갖는다
+//--------------------------------------------------------------------
+#include <iostream>
+#include <map>
+#include <random>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+default_random_engine dre;
+normal_distribution nd{ 0.0, 0.3 };
+
+//-----------
+int main()
+//-----------
+{
+	map<int, int> IIMap;
+	for (int i = 0; i < 10000; ++i) {
+		int num = int(nd(dre) * 50 + 50);
+		if (0 <= num and num < 100)
+			IIMap[num / 5]++;
+	}
+	for (const auto& [구간, 개수] : IIMap) {
+		for (int i = 0; i < 개수 / 100; ++i)
+			cout << "*";
+		cout << endl;
+	}
+
+
+	//save("String.h");
+	//save("String.cpp");
+	save("소스.cpp");
+}
