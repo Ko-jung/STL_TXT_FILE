@@ -1,0 +1,60 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/25/23 Thursday 16:16:07 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(13주 1일)
+//--------------------------------------------------------------------
+// Unordered Assoiciative container 
+// 1. 순서 없다는 것의 의미 관찰
+// 2. 메모리 구조를 화면에 출력
+// 3. String 객체를 원소로 넣으려면?
+//--------------------------------------------------------------------
+#include <iostream>
+#include <unordered_set>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+void print(const auto& us) {
+	for (int i = 0; i < us.bucket_count(); ++i) {
+		cout << "[" << i << "]";
+		for (auto p = us.begin(i); p != us.end(i); ++p) {
+			cout << " - " << *p;
+		}
+		cout << endl;
+	}
+	cout << "-----------------------------------------------------------" << endl << endl;
+}
+
+struct My_hasher {
+	int operator()(const String& s) const {
+		return rand()%8;
+	}
+};
+
+// String으로 특수화
+template <>
+struct hash<String> {
+	size_t operator()(const String& str) const {
+		// 기본적으로 지원해주는 str의 hash를 이용하겠다
+		return hash<std::string>()(str.getString());
+	}
+};
+
+//-----------
+int main()
+//-----------
+{
+	// <String, hash<String>을 안 적어도 된다. 특수화를 했기 때문에
+	unordered_multiset<String> us{ "STL", "Containers", "Iterators", "Algorithm"};
+	print(us);
+
+	save("소스.cpp");
+	//save("String.h");
+	//save("String.cpp");
+}

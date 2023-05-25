@@ -1,0 +1,118 @@
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(13주 1일)
+//--------------------------------------------------------------------
+// 컨테이너의 찾기 실력 검증 (천 만개 중에서 만 개를 찾는다)
+// 
+// vector			- 12.866255초
+// set				-  0.  9923초
+// sorted vector	-  0.  2669초
+// unordered_set	-  0.   410초
+// 
+// 정렬 시간 포함해도 set은 절대 못 따라온다.
+// (특수한 경우가 아니면 set은 잘 안 쓰더라)
+//--------------------------------------------------------------------
+#include <iostream>
+
+#include <array>
+#include <vector>
+#include <set>
+#include <unordered_set>
+
+#include <algorithm>
+#include <random>
+
+#include <chrono>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+array<int, 10'000'000> numbers;
+array<int, 10'000> toFind;
+
+default_random_engine dre;
+uniform_int_distribution uid{ 1,100'000'000 };
+
+//-----------
+int main()
+//-----------
+{
+	for (int& n : numbers)
+		n = uid(dre);
+	for (int& n : toFind)
+		n = uid(dre);
+
+	{	// Vector의 찾기 실력
+		vector<int> v{ numbers.begin(), numbers.end() };
+		int cnt{};
+		cout << "벡터에서 찾는 중..." << endl;
+		
+		auto start = chrono::steady_clock::now();	// 시간 재기 시작
+		for (int number : toFind) {
+			if (find(v.begin(), v.end(), number) != v.end())
+				++cnt;
+		}
+		auto end = chrono::steady_clock::now();				//시간 재기 끝
+		auto elapsedTime = (chrono::duration_cast<chrono::microseconds>)(end - start).count();
+		cout << "찾은 개수: " << cnt << "개, 걸린시간: " << elapsedTime << "μs" << endl << endl;
+	}
+
+	{	// Set의 찾기 실력
+		cout << "Set에 데이터를 넣는 중 ...";
+		cout << endl;
+		set<int> s{ numbers.begin(), numbers.end() };
+		int cnt{};
+		cout << "Set에서 찾는 중..." << endl;
+
+		auto start = chrono::steady_clock::now();	// 시간 재기 시작
+		for (int number : toFind) {
+			if (s.contains(number))					// 어디에 있는지가 아닌 그냥 있는지
+				++cnt;
+		}
+		auto end = chrono::steady_clock::now();				//시간 재기 끝
+		auto elapsedTime = (chrono::duration_cast<chrono::microseconds>)(end - start).count();
+		cout << "찾은 개수: " << cnt << "개, 걸린시간: " << elapsedTime << "μs" << endl << endl;
+	}
+
+	{	// Unordered_set의 찾기 실력
+		cout << "Unordered_set에 데이터를 넣는 중 ...";
+		cout << endl;
+		unordered_set<int> us{ numbers.begin(), numbers.end() };
+		int cnt{};
+		cout << "Unordered_set 찾는 중..." << endl;
+
+		auto start = chrono::steady_clock::now();	// 시간 재기 시작
+		for (int number : toFind) {
+			if (us.contains(number))
+				++cnt;
+		}
+		auto end = chrono::steady_clock::now();				//시간 재기 끝
+		auto elapsedTime = (chrono::duration_cast<chrono::microseconds>)(end - start).count();
+		cout << "찾은 개수: " << cnt << "개, 걸린시간: " << elapsedTime << "μs" << endl << endl;
+	}
+
+	{	// 정렬된 Vector의 찾기 실력
+		vector<int> v{ numbers.begin(), numbers.end() };
+
+		cout << "Vector를 정렬 하는 중..." << endl;
+		sort(v.begin(), v.end());
+		cout << "정렬 끝" << endl;
+
+		int cnt{};
+		cout << "정렬된 벡터에서 찾는 중..." << endl;
+
+		auto start = chrono::steady_clock::now();	// 시간 재기 시작
+		for (int number : toFind) {
+			if (binary_search(v.begin(), v.end(), number))
+				++cnt;
+		}
+		auto end = chrono::steady_clock::now();				//시간 재기 끝
+		auto elapsedTime = (chrono::duration_cast<chrono::microseconds>)(end - start).count();
+		cout << "찾은 개수: " << cnt << "개, 걸린시간: " << elapsedTime << "μs" << endl << endl;
+	}
+	save("소스.cpp");
+	//save("String.h");
+	//save("String.cpp");
+}
