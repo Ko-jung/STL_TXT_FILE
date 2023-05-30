@@ -1,0 +1,48 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/30/23 Tuesday 18:48:13 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(13주 2일)
+//--------------------------------------------------------------------
+// C++20 Concepts, Range, Coroutine, Module
+// 알고리즘
+//--------------------------------------------------------------------
+#include <iostream>
+
+#include <array>
+#include <algorithm>
+#include <format>
+#include <thread>
+
+#include <ranges>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	save("소스.cpp");
+	// [문제] 전광판 구현 - rotate
+	//String s{ "C++ STL Containers Iterators Algorithms " };
+	std::string s{ "C++ STL Containers Iterators Algorithms " };
+	for (int i = 0; i < 10; i++)
+	{
+		cout << endl;
+	}
+	while (true) {
+		cout << format("{:^79}", s);
+		rotate(s.begin(), s.begin() + 1, s.end());
+		cout << '\r';
+		this_thread::sleep_for(100ms);
+	}
+
+	//save("String.h");
+	//save("String.cpp");
+}

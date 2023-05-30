@@ -1,0 +1,46 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/30/23 Tuesday 18:55:41 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(13주 2일)
+//--------------------------------------------------------------------
+// C++20 Concepts, Range, Coroutine, Module
+// 알고리즘
+//--------------------------------------------------------------------
+#include <iostream>
+
+#include <array>
+#include <algorithm>
+#include <format>
+#include <thread>
+#include <random>
+
+#include <numeric>
+#include <ranges>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+
+	// [문제] 로또 번호
+	array<int, 45> lotto;
+	iota(lotto.begin(), lotto.end(), 1);
+
+	cout << "이번주 번호는 이걸로 - ";
+	sample(lotto.begin(), lotto.end(), ostream_iterator<int>{cout, " "}, 6,
+		default_random_engine(random_device{}())
+		);
+
+	save("소스.cpp");
+	//save("String.h");
+	//save("String.cpp");
+}

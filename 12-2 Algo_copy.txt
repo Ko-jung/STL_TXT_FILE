@@ -1,0 +1,53 @@
+
+
+============================================================
+소스.cpp, 저장시간: 05/30/23 Tuesday 19:02:27 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(13주 2일)
+//--------------------------------------------------------------------
+// C++20 Concepts, Range, Coroutine, Module
+// 알고리즘
+//--------------------------------------------------------------------
+#include <iostream>
+
+#include <array>
+#include <algorithm>
+#include <format>
+#include <thread>
+#include <random>
+#include <set>
+
+#include <numeric>
+#include <ranges>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+
+	// [문제] copy는 왜 mutating 알고리즘인가?
+	// 왜 값을 바꾸는 알고리즘일까?
+	array<int, 7> a{ 1,2,3,4,5,6,7 };
+
+	// set 안됨
+	// set<int> s{ 1,2,3,4,5,6,7 };
+	// copy(s.begin(), s.end(), ++s.begin());		// a의 두 번째에 복사도 가능하다
+
+	copy(a.begin(), a.end(), a.begin() + 1);		// a의 두 번째에 복사도 가능하다
+	//copy(a.begin(), a.end(), ostream_iterator<int>{cout, ""});
+
+	for (int n : a)
+		cout << n << " ";
+	cout << endl;
+
+	save("소스.cpp");
+	//save("String.h");
+	//save("String.cpp");
+}
