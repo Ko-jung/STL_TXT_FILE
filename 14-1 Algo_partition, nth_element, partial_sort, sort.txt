@@ -1,0 +1,131 @@
+
+
+============================================================
+소스.cpp, 저장시간: 06/01/23 Thursday 16:08:31 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(14주 1일)
+//--------------------------------------------------------------------
+// 정렬 관련 알고리즘
+// partition - 조건에 맞는것과 아닌 것을 공간 분리
+// ---------------- 정렬이라 보기엔 좀...
+// nth_element
+// partial_sort
+// sort
+// stable_sort
+//--------------------------------------------------------------------
+#include <iostream>
+#include <array>
+#include <algorithm>
+#include <format>
+#include <random>
+#include <string>
+
+#include <numeric>
+
+#include "String.h"
+#include "save.h"
+
+std::default_random_engine dre{ std::random_device{}() };
+
+using namespace std;
+extern bool 관찰;
+
+//-----------
+int main()
+//-----------
+{
+	array<int, 100> n;
+	ranges::iota(n, 1);	
+
+	{	// partition - 9가 들어간 숫자와 나머지를 분리
+		cout << "==========Prev Partition==========" << endl;
+		ranges::shuffle(n, dre);
+		for (int a : n)
+			cout << format("{:4}", a);
+			//ranges::copy(n, ostream_iterator<int>{cout, ", ");
+		cout << endl;
+
+
+		cout << "==========After Partitioin==========" << endl;;
+		auto p = partition(n.begin(), n.end(), [](int n) {
+			std::string s = to_string(n);
+			return s.contains('9');
+			});
+
+		cout << "9가 들어간 숫자" << endl;
+		for (auto i = n.begin(); i != p; ++i)
+			cout << format("{:4}", *i);
+		cout << endl;
+		cout << "9가 없는 숫자" << endl;
+		for (auto i = p; i != n.end(); ++i)
+			cout << format("{:4}", *i);
+		cout << endl << endl;
+	}
+
+	{	// nth_element, 정렬한 것 처럼 보이지만 아니다
+		cout << "==========Prev nth_element==========" << endl;
+		ranges::shuffle(n, dre);
+		for (int a : n)
+			cout << format("{:4}", a);
+		//ranges::copy(n, ostream_iterator<int>{cout, ", ");
+		cout << endl;
+
+
+		cout << "==========After nth_element==========" << endl;;
+		ranges::nth_element(n, n.begin() + 20);
+
+		cout << "Until nth" << endl;
+		for (auto i = n.begin(); i != n.begin() + 20; ++i)
+			cout << format("{:4}", *i);
+		cout << endl;
+		cout << "Since Nth" << endl;
+		for (auto i = n.begin() + 20; i != n.end(); ++i)
+			cout << format("{:4}", *i);
+		cout << endl << endl;
+	}
+
+	{	// partial_sort
+		cout << "==========Prev partial_sort==========" << endl;
+		ranges::shuffle(n, dre);
+		for (int a : n)
+			cout << format("{:4}", a);
+		//ranges::copy(n, ostream_iterator<int>{cout, ", ");
+		cout << endl;
+
+
+		cout << "==========After partial_sort==========" << endl;;
+		ranges::partial_sort(n, n.begin() + 20);
+
+		cout << "Until sort" << endl;
+		for (auto i = n.begin(); i != n.begin() + 20; ++i)
+			cout << format("{:4}", *i);
+		cout << endl;
+		cout << "Since sort" << endl;
+		for (auto i = n.begin() + 20; i != n.end(); ++i)
+			cout << format("{:4}", *i);
+		cout << endl << endl;
+	}
+
+	{	// sort
+		cout << "==========Prev sort==========" << endl;
+		ranges::shuffle(n, dre);
+		for (int a : n)
+			cout << format("{:4}", a);
+		//ranges::copy(n, ostream_iterator<int>{cout, ", ");
+		cout << endl;
+
+
+		cout << "==========After sort==========" << endl;;
+		ranges::sort(n);
+
+		cout << "Until sort" << endl;
+		for (auto i = n.begin(); i != n.end(); ++i)
+			cout << format("{:4}", *i);
+		cout << endl << endl;
+	}
+
+	save("소스.cpp");
+	//save("String.h");
+	//save("String.cpp");
+}
