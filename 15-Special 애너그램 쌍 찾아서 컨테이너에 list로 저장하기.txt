@@ -1,0 +1,114 @@
+
+
+============================================================
+소스.cpp, 저장시간: 06/12/23 Monday 23:21:17 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(Special)
+//--------------------------------------------------------------------
+// 2023 STL 총정리 실습
+// - 단어들.txt 파일을 다운 받는다
+// - 단어들을 컨테이너에 저장한다 -> 369'882 단어가 있다
+// - 진짜 정렬되어 있나? -> boolalpha is_sorted로 되어있는것을 확인
+// - 혹시 중복된 단어는 없나? - 없다. unique로 확인
+// - 길이가 가장 긴 단어는? - dichlorodiphenyltrichloroethane
+// - 길이가 같은 단어를 몇 개 화면에 출력
+// - 사용자가 입력한 단어가 사전에 있나 검사
+//		사전에 있는 단어라면 anagram을 출력한다.
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>
+#include <ranges>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+using std::string;
+
+extern bool 관찰;
+
+struct PS :pair<std::string, std::string> {
+	PS(std::string s) :pair(s, s) {
+		sort(first.begin(), first.end());
+	}
+};
+
+//-----------
+int main()
+//-----------
+{
+	save("소스.cpp");
+	ifstream in{ "단어들.txt" };
+	if (not in) {
+		cout << "파일을 열 수 없습니다." << endl;
+		exit(0);
+	}
+	PS dog{ "dog" };
+	cout << dog.first << ", " << dog.second << endl;
+
+	vector<PS> v;
+	v.reserve(400'000);
+
+	string s;
+	while (in >> s)
+		v.push_back(s);
+	cout << "단어 개수 - " << s.size() << endl;
+
+	// v를 first 기준으로 정렬
+	auto PS기준 = [](const PS& a, const PS& b) {
+		return a.first < b.first;
+	};
+	sort(v.begin(), v.end(), PS기준);
+
+
+	// 전체 anagram 쌍을 컨테이너에 출력하라
+	vector<list<string>> anagrams;
+
+	//for (const auto& [정렬, 원본] : v
+	//	| views::take(100))
+	//	cout << 정렬 << " - " << 원본 << endl;
+
+	auto i = v.begin();
+	int cnt{};
+
+	while (true) {
+		i = adjacent_find(i, v.end(), [](const PS& a, const PS& b) {
+			return a.first == b.first;
+			});
+
+		if (i == v.end())
+			break;
+
+		//그렇다면 i와 i+1의 first 는 같다
+		auto j = find_if_not(i + 1, v.end(), [i](const PS& a) {
+			return i->first == a.first;
+			});
+
+		// [i, j)는 애너그램 쌍이다.
+		list<string> con;
+		for (auto k = i; k < j; ++k)
+			con.push_back(k->second);
+		anagrams.push_back(con);
+
+		i = j;
+	}
+
+	cout << "모두 " << anagrams.size() << "개의 애너그램 쌍을 찾았습니다." << endl;
+
+	// 애너그램 개수가 많은 순서대로 정렬
+	sort(anagrams.begin(), anagrams.end(), [](const list<string>& a, const list<string>& b) {
+		return a.size() > b.size();
+		});
+	for (int i = 0; i < 10; i++) {
+		cout << anagrams[i].size() << " - ";
+		for (const string& word : anagrams[i])
+			cout << word << " ";
+		cout << endl;
+	}
+}

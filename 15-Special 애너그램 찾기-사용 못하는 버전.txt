@@ -1,0 +1,115 @@
+
+
+============================================================
+소스.cpp, 저장시간: 06/12/23 Monday 22:43:09 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(Special)
+//--------------------------------------------------------------------
+// 2023 STL 총정리 실습
+// - 단어들.txt 파일을 다운 받는다
+// - 단어들을 컨테이너에 저장한다 -> 369'882 단어가 있다
+// - 진짜 정렬되어 있나? -> boolalpha is_sorted로 되어있는것을 확인
+// - 혹시 중복된 단어는 없나? - 없다. unique로 확인
+// - 길이가 가장 긴 단어는? - dichlorodiphenyltrichloroethane
+// - 길이가 같은 단어를 몇 개 화면에 출력
+// - 사용자가 입력한 단어가 사전에 있나 검사
+//		사전에 있는 단어라면 anagram을 출력한다.
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ranges>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+extern bool 관찰;
+
+struct PS :pair<std::string, std::string> {
+	PS(std::string s) :pair(s, s) {
+		sort(first.begin(), first.end());
+	}
+};
+
+//-----------
+int main()
+//-----------
+{
+
+	save("소스.cpp");
+	ifstream in{ "단어들.txt" };
+	if (not in) {
+		cout << "파일을 열 수 없습니다." << endl;
+		exit(0);
+	}
+	vector < std::string> v;
+	v.reserve(100'000);
+
+	copy(istream_iterator<std::string>{in}, {}, back_inserter(v));
+	cout << "읽은 단어의 수 - " << v.size() << endl;
+
+	cout << "정렬 되어 있나? - " << boolalpha << is_sorted(v.begin(), v.end()) << endl;
+
+	auto p = unique(v.begin(), v.end());
+	if (p == v.end())
+		cout << "중복된 단어는 없다." << endl;
+	else
+		cout << "중복된 단어가 있다." << endl;
+
+	// 길이가 가장 긴 단어는
+	auto 긴단어 = [](const std::string& a, const std::string& b) {
+		return a.size() < b.size();
+	};
+	auto 긴단어위치 = max_element(v.begin(), v.end(), 긴단어);
+	cout << "가장 긴 단어 - " << *긴단어위치 << endl;
+
+	// 길이가 12글자 짜리 단어 몇 개를 화면에 출력해 본다
+	cout << "원하는 글자수를 입력하세요: ";
+	int num{};
+	cin >> num;
+
+	for (const std::string& s : v | views::filter([](const std::string& s) {return s[0] == 'c'; })
+								  | views::filter([num](const std::string& s) {return s.size() == num; })
+								  | views::take(10))
+		cout << s << endl;
+
+	// anagram을 찾는 프로그램이다
+	// 사용자가 입력한 단어와 anagram 관계에 있는 단어를 모두 출력한다.
+
+	cout << "=============================" << endl;
+	cout << "애너그램을 찾아 드립니다." << endl;
+	cout << "=============================" << endl;
+	while (true) {
+		cout << "찾을 단어를 입력하세요: ";
+		std::string toFind;
+		cin >> toFind;
+		if (not binary_search(v.begin(), v.end(), toFind)) {
+			cout << "사전에 없는 단어입니다." << endl << endl;
+			continue;
+		}
+		// 애너그램을 찾아 표시한다
+		cout << "가능한 조합의 개수 - ";
+		long long pNum = 1;
+		for (int i = 0; i < toFind.size(); i++)
+			pNum *= i + 1;
+		cout << pNum << endl;
+		cout << endl;
+
+		// cout << "찾아야 할 가능한 조합들" << endl;
+		std::string word = toFind;
+		sort(word.begin(), word.end());
+		do {
+			if(binary_search(v.begin(), v.end(), word))
+				cout << word << " ";
+
+			// next_permutation은 정렬이 되어 있어야한다!
+		} while (next_permutation(word.begin(), word.end()));
+		cout << endl << endl;
+	}
+}
