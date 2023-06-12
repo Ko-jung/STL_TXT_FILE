@@ -1,0 +1,56 @@
+
+
+============================================================
+소스.cpp, 저장시간: 06/12/23 Monday 20:45:56 
+============================================================
+//--------------------------------------------------------------------
+// 2023년 1학기 STL 3월 2일 목78		화910 목78		(14주 2일)
+//--------------------------------------------------------------------
+// C++20 ranges
+//--------------------------------------------------------------------
+
+#include <iostream>
+#include<ranges>
+#include <algorithm>
+#include <vector>
+#include <random>
+
+#include "String.h"
+#include "save.h"
+
+using namespace std;
+
+extern bool 관찰;
+
+default_random_engine dre;
+uniform_int_distribution uid{ 1,100 };
+uniform_int_distribution<int> uidC{'a', 'c'};
+
+struct Dog {
+	int n = uid(dre);
+	char c = uidC(dre);
+
+	int getN() const {
+		return n;
+	}
+};
+
+//-----------
+int main()
+//-----------
+{
+	vector<Dog> v(20);
+
+	//ranges::sort(v, [](const Dog& a, const Dog& b) {
+	//	return a.n < b.n;
+	//	});
+
+	// 어떤 객체를 일부분으로 대표해서
+	// Dog를 n으로 projection했다
+	ranges::sort(v, {/*내림차순하려면 적어*/}, &Dog::n /*&Dog::getN 도 가능*/);
+
+	for (auto [글자, 개수] : v)
+		cout << 글자 << " - " << 개수 << endl;
+
+	save("소스.cpp");
+}
